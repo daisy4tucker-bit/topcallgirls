@@ -27,8 +27,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToLocation }) => {
           {/* Col 1 Brand */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="relative flex items-center justify-center p-1.5 rounded-lg bg-red-600/15 border border-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.4)]">
-                <MapPin className="w-4 h-4 text-red-500 fill-red-500 shrink-0 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              <div className="relative flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-red-950/40 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                <img
+                  src="/logo.jpg"
+                  alt="Top Call Girls Logo"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex items-center text-lg font-black tracking-tight">
                 <span className="text-red-500">Top</span>

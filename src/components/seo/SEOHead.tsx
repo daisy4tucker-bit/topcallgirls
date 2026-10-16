@@ -44,6 +44,13 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     let ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', description);
 
+    // Update OG & Twitter Image
+    const ogImageUrl = profileData?.coverUrl || profileData?.avatarUrl || '/og-image.jpg';
+    let ogImg = document.querySelector('meta[property="og:image"]');
+    if (ogImg) ogImg.setAttribute('content', ogImageUrl);
+    let twImg = document.querySelector('meta[name="twitter:image"]');
+    if (twImg) twImg.setAttribute('content', ogImageUrl);
+
     // Robots meta tag
     let robots = document.querySelector('meta[name="robots"]');
     if (noIndex) {

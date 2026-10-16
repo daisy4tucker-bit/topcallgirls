@@ -54,9 +54,14 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-lg"
             aria-label="Top Call Girls Home"
           >
-            <div className="relative flex items-center justify-center p-2 rounded-xl bg-red-600/15 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.4)] group-hover:scale-105 transition-transform">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 fill-red-500 shrink-0 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-[#081528] animate-ping" />
+            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-red-950/40 border border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.5)] group-hover:scale-105 transition-transform">
+              <img
+                src="/logo.jpg"
+                alt="Top Call Girls Logo"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-1 ring-[#081528] animate-ping" />
             </div>
             <div className="flex items-center text-xl sm:text-2xl font-black tracking-tight">
               <span className="text-red-500">Top</span>
