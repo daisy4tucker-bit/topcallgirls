@@ -5,7 +5,7 @@ import { Profile } from '../types';
 import { enforceAdminAuthorization, isUserAdmin } from './authService';
 import { sanitizeInput } from '../utils/securityUtils';
 
-// Initial admin data seeding with the 3 published profiles
+// Initial admin data seeding with the 4 published profiles
 export const INITIAL_ADMIN_PROFILES: ExtendedProfile[] = SAMPLE_PROFILES.map((p) => ({
   ...p,
   status: 'published' as ProfileStatus,
@@ -97,15 +97,15 @@ let adminProfiles: ExtendedProfile[] = (() => {
           p.avatarUrl?.includes('unsplash.com') || p.coverUrl?.includes('unsplash.com')
         );
         const ariaProfile = Array.isArray(parsed) && parsed.find((p: any) => p.slug === 'aria-sterling');
-        const hasNewVersion = ariaProfile && ariaProfile.lastUpdated?.includes('(v2)');
-        if (!hasOldImages && hasNewVersion && Array.isArray(parsed) && parsed.length > 0) {
+        const hasNewDescription = ariaProfile && ariaProfile.fullDescription?.includes('Wellness4All');
+        if (!hasOldImages && hasNewDescription && Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
       } catch (e) {
         // ignore
       }
     }
-    // Save the new 3 profiles to localStorage
+    // Save the new 4 profiles to localStorage
     try {
       localStorage.setItem('aura_admin_profiles', JSON.stringify(INITIAL_ADMIN_PROFILES));
     } catch (e) {
@@ -119,19 +119,12 @@ let safetyReports: SafetyReport[] = [...INITIAL_REPORTS];
 let removalRequests: ContentRemovalRequest[] = [...INITIAL_REMOVAL_REQUESTS];
 let auditLogs: AuditLogEntry[] = [...INITIAL_AUDIT_LOGS];
 
-// Admin Auth Helper
-const ADMIN_PASSCODE = 'admin18plus'; // Default dev admin passcode
-
+// Admin Auth Helper (Disabled)
 export function checkIsAdminAuthenticated(): boolean {
-  if (typeof window === 'undefined') return false;
-  return sessionStorage.getItem('aura_admin_session') === 'active';
+  return false;
 }
 
-export function loginAdmin(passcode: string): boolean {
-  if (passcode === ADMIN_PASSCODE || passcode === 'admin' || passcode === 'aura2026') {
-    sessionStorage.setItem('aura_admin_session', 'active');
-    return true;
-  }
+export function loginAdmin(_passcode: string): boolean {
   return false;
 }
 

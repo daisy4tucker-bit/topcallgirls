@@ -30,20 +30,17 @@ export function getCurrentSession(): AuthSession {
   if (typeof window === 'undefined') {
     return { user: null, role: 'visitor', isAuthenticated: false, accessToken: null, expiresAt: 0 };
   }
-
   try {
     const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (!raw) {
       return { user: null, role: 'visitor', isAuthenticated: false, accessToken: null, expiresAt: 0 };
     }
-
     const session: AuthSession = JSON.parse(raw);
     // Check expiration
     if (Date.now() > session.expiresAt) {
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
       return { user: null, role: 'visitor', isAuthenticated: false, accessToken: null, expiresAt: 0 };
     }
-
     return session;
   } catch (e) {
     return { user: null, role: 'visitor', isAuthenticated: false, accessToken: null, expiresAt: 0 };
@@ -54,8 +51,14 @@ export function getCurrentSession(): AuthSession {
  * Check if the current user is an authenticated administrator
  */
 export function isUserAdmin(): boolean {
-  const session = getCurrentSession();
-  return session.isAuthenticated && (session.role === 'administrator' || session.role === 'moderator');
+  return false;
+}
+
+/**
+ * Quick admin passcode login for AdminAuthGate (Disabled)
+ */
+export function loginAdmin(_password: string): boolean {
+  return false;
 }
 
 /**
@@ -70,91 +73,12 @@ export function getCurrentRole(): UserRole {
  * Login with Email & Password
  */
 export async function loginWithEmailAndPassword(
-  email: string,
-  passcodeOrPassword: string
+  _email: string,
+  _passcodeOrPassword: string
 ): Promise<{ success: boolean; session?: AuthSession; error?: string }> {
-  const cleanEmail = email.trim().toLowerCase();
-  const cleanPass = passcodeOrPassword.trim();
-
-  // 1. Check Supabase Auth if online
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPass,
-      });
-
-      if (!error && data.user) {
-        const userRole: UserRole = (data.user.user_metadata?.role as UserRole) || 'administrator';
-        const session: AuthSession = {
-          user: {
-            id: data.user.id,
-            email: data.user.email || cleanEmail,
-            role: userRole,
-            displayName: data.user.user_metadata?.display_name || 'Admin Officer',
-            lastLogin: new Date().toISOString(),
-            sessionToken: data.session?.access_token || `tok-${Date.now()}`,
-            sessionExpiresAt: new Date(Date.now() + SESSION_DURATION_MS).toISOString(),
-          },
-          role: userRole,
-          isAuthenticated: true,
-          accessToken: data.session?.access_token || `tok-${Date.now()}`,
-          expiresAt: Date.now() + SESSION_DURATION_MS,
-        };
-
-        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-        sessionStorage.setItem('aura_admin_session', 'active');
-        recordAuditLog('profile_published', 'profile', session.user?.id || 'admin', `Admin ${cleanEmail} logged in via Supabase Auth.`);
-        return { success: true, session };
-      }
-    } catch (err) {
-      console.warn('Supabase Auth error, checking fallback admin credentials:', err);
-    }
-  }
-
-  // 2. Fallback / Dev Admin Verification
-  const matchedAdmin = ADMIN_ACCOUNTS.find(
-    (acc) =>
-      acc.email.toLowerCase() === cleanEmail &&
-      acc.passwords.includes(cleanPass)
-  );
-
-  // Also support quick passcode-only match
-  const matchedPasscodeOnly = ADMIN_ACCOUNTS.find((acc) => acc.passwords.includes(cleanPass));
-
-  const targetAcc = matchedAdmin || (cleanEmail === '' ? matchedPasscodeOnly : null);
-
-  if (targetAcc) {
-    const session: AuthSession = {
-      user: {
-        id: targetAcc.id,
-        email: targetAcc.email,
-        role: targetAcc.role,
-        displayName: targetAcc.displayName,
-        lastLogin: new Date().toISOString(),
-        sessionToken: `aura-sec-${Math.random().toString(36).substring(2, 12)}`,
-        sessionExpiresAt: new Date(Date.now() + SESSION_DURATION_MS).toISOString(),
-      },
-      role: targetAcc.role,
-      isAuthenticated: true,
-      accessToken: `jwt-bearer-${Date.now()}`,
-      expiresAt: Date.now() + SESSION_DURATION_MS,
-    };
-
-    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-    sessionStorage.setItem('aura_admin_session', 'active');
-    recordAuditLog(
-      'profile_published',
-      'profile',
-      targetAcc.id,
-      `Admin ${targetAcc.email} (${targetAcc.role}) authenticated successfully.`
-    );
-    return { success: true, session };
-  }
-
   return {
     success: false,
-    error: 'Invalid administrator credentials. Please check your email and password.',
+    error: 'Administrator login has been disabled by the system owner.',
   };
 }
 
@@ -180,8 +104,10 @@ export async function logoutCurrentSession(): Promise<boolean> {
     }
   }
 
-  sessionStorage.removeItem(SESSION_STORAGE_KEY);
-  sessionStorage.removeItem('aura_admin_session');
+  try {
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    sessionStorage.removeItem('aura_admin_session');
+  } catch (e) {}
   return true;
 }
 
@@ -190,7 +116,6 @@ export async function logoutCurrentSession(): Promise<boolean> {
  */
 export async function requestPasswordRecovery(email: string): Promise<PasswordRecoveryRequest> {
   const clean = email.trim().toLowerCase();
-
   if (!clean || !clean.includes('@')) {
     return {
       email: clean,
@@ -204,7 +129,6 @@ export async function requestPasswordRecovery(email: string): Promise<PasswordRe
       const { error } = await supabase.auth.resetPasswordForEmail(clean, {
         redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/admin`,
       });
-
       if (error) {
         return {
           email: clean,
@@ -227,7 +151,6 @@ export async function requestPasswordRecovery(email: string): Promise<PasswordRe
 
 /**
  * Enforce Server / Service Level Authorization Guard
- * Throws an explicit 403 error if user is not authorized.
  */
 export function enforceAdminAuthorization(operationName: string): boolean {
   const session = getCurrentSession();

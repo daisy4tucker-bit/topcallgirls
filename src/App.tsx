@@ -37,34 +37,7 @@ import { SEOHead } from './components/seo/SEOHead';
 import { SEOSERPInspector } from './components/seo/SEOSERPInspector';
 import { InternalLinkNetwork } from './components/seo/InternalLinkNetwork';
 
-// Admin CMS Imports
-import { AdminLayout, AdminTab } from './components/admin/AdminLayout';
-import { AdminAuthGate } from './components/admin/AdminAuthGate';
-import { AdminDashboardView } from './components/admin/AdminDashboardView';
-import { AdminProfilesView } from './components/admin/AdminProfilesView';
-import { AdminProfileEditor } from './components/admin/AdminProfileEditor';
-import { AdminPhotosView } from './components/admin/AdminPhotosView';
-import { AdminLocationsView } from './components/admin/AdminLocationsView';
-import { AdminReportsView } from './components/admin/AdminReportsView';
-import { AdminContentRemovalView } from './components/admin/AdminContentRemovalView';
-import { AdminModerationView } from './components/admin/AdminModerationView';
-import { AdminAuditLogsView } from './components/admin/AdminAuditLogsView';
-import { AdminRLSPoliciesView } from './components/admin/AdminRLSPoliciesView';
-import { AdminTechnicalAuditView } from './components/admin/AdminTechnicalAuditView';
-import { isUserAdmin } from './services/authService';
-import {
-  checkIsAdminAuthenticated,
-  getAdminProfiles,
-  getAdminStats,
-  getSafetyReports,
-  getRemovalRequests,
-  getAuditLogs,
-  saveAdminProfile,
-  updateProfileStatus,
-  deleteAdminProfile,
-  INITIAL_ADMIN_PROFILES,
-} from './services/adminService';
-import { ExtendedProfile, ProfileStatus } from './types/admin';
+import { INITIAL_ADMIN_PROFILES } from './services/adminService';
 
 import { fetchProfilesFromDB, insertProfileToDB } from './services/profileService';
 import { LOCATION_DATA, getLocationBySlugs, buildLocationBreadcrumbs } from './data/locationHierarchy';
@@ -72,7 +45,6 @@ import { SAMPLE_PROFILES } from './data/mockProfiles';
 import { Profile, FilterState } from './types';
 
 export default function App() {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(checkIsAdminAuthenticated());
   const [profiles, setProfiles] = useState<Profile[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -93,11 +65,6 @@ export default function App() {
     }
     return SAMPLE_PROFILES;
   });
-  const [adminProfilesList, setAdminProfilesList] = useState<ExtendedProfile[]>(() =>
-    checkIsAdminAuthenticated() ? getAdminProfiles() : []
-  );
-  const [profileToEdit, setProfileToEdit] = useState<ExtendedProfile | null>(null);
-
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -202,87 +169,7 @@ export default function App() {
     );
   }, [profiles, currentProfile]);
 
-  // Admin Sub-Tab determination from currentPath
-  const adminTab: AdminTab = useMemo(() => {
-    if (currentPath === '/admin/profiles/new') return 'profile-new';
-    if (currentPath.startsWith('/admin/profiles/')) return 'profile-new'; // Edit
-    if (currentPath.startsWith('/admin/profiles')) return 'profiles';
-    if (currentPath.startsWith('/admin/photos')) return 'photos';
-    if (currentPath.startsWith('/admin/locations')) return 'locations';
-    if (currentPath.startsWith('/admin/reports')) return 'reports';
-    if (currentPath.startsWith('/admin/content-removal')) return 'content-removal';
-    if (currentPath.startsWith('/admin/moderation')) return 'moderation';
-    if (currentPath.startsWith('/admin/audit-logs')) return 'audit-logs';
-    if (currentPath.startsWith('/admin/rls-policies') || currentPath.startsWith('/admin/auth')) return 'rls-policies';
-    if (currentPath.startsWith('/admin/technical-audit') || currentPath.startsWith('/admin/audit-checklist')) return 'technical-audit';
-    return 'dashboard';
-  }, [currentPath]);
 
-  // Admin stats & data
-  const adminStats = useMemo(() => {
-    if (!isAdminLoggedIn) {
-      return {
-        publishedCount: 0,
-        draftCount: 0,
-        pendingCount: 0,
-        approvedCount: 0,
-        rejectedCount: 0,
-        suspendedCount: 0,
-        removedCount: 0,
-        totalProfiles: 0,
-        pendingReportsCount: 0,
-        removalRequestsCount: 0,
-        totalLocationsCount: 0,
-      };
-    }
-    return getAdminStats();
-  }, [isAdminLoggedIn, adminProfilesList]);
-
-  const auditLogsList = useMemo(() => {
-    if (!isAdminLoggedIn) return [];
-    return getAuditLogs();
-  }, [isAdminLoggedIn, adminProfilesList]);
-
-  const safetyReportsList = useMemo(() => {
-    if (!isAdminLoggedIn) return [];
-    return getSafetyReports();
-  }, [isAdminLoggedIn]);
-
-  // Admin Profile Handlers
-  const handleAdminSaveProfile = (saved: ExtendedProfile) => {
-    saveAdminProfile(saved);
-    setAdminProfilesList([...getAdminProfiles()]);
-    // Also update public profiles if published
-    if (saved.status === 'published') {
-      setProfiles((prev) => {
-        const existing = prev.findIndex((p) => p.id === saved.id);
-        if (existing >= 0) {
-          const updated = [...prev];
-          updated[existing] = saved;
-          return updated;
-        }
-        return [saved, ...prev];
-      });
-    }
-    navigateTo('/admin/profiles');
-  };
-
-  const handleAdminUpdateStatus = (id: string, status: ProfileStatus) => {
-    updateProfileStatus(id, status);
-    setAdminProfilesList([...getAdminProfiles()]);
-    if (status !== 'published') {
-      setProfiles((prev) => prev.filter((p) => p.id !== id));
-    } else {
-      const p = getAdminProfiles().find((item) => item.id === id);
-      if (p) setProfiles((prev) => [p, ...prev.filter((i) => i.id !== id)]);
-    }
-  };
-
-  const handleAdminDeleteProfile = (id: string) => {
-    deleteAdminProfile(id);
-    setAdminProfilesList([...getAdminProfiles()]);
-    setProfiles((prev) => prev.filter((p) => p.id !== id));
-  };
 
   // Location route segments for public directory
   const routeSegments = useMemo(() => {
@@ -422,126 +309,12 @@ export default function App() {
   );
 
   // --------------------------------------------------------------------------
-  // ROUTE BRANCH 1: ADMIN CMS BACKEND (/admin/*)
+  // ROUTE BRANCH 1: ADMIN CMS BACKEND (/admin/*) - DISABLED BY USER REQUEST
   // --------------------------------------------------------------------------
   if (isAdminRoute) {
-    if (!isAdminLoggedIn) {
-      return (
-        <>
-          <SEOHead
-            title="Administrator Login"
-            description="Restricted Administrator Authentication Portal."
-            canonicalPath={currentPath}
-            noIndex={true}
-          />
-          <AdminAuthGate
-            onSuccess={() => {
-              setIsAdminLoggedIn(true);
-              setAdminProfilesList(getAdminProfiles());
-            }}
-            onExit={() => navigateTo('/')}
-          />
-        </>
-      );
+    if (typeof window !== 'undefined' && currentPath !== '/') {
+      window.history.replaceState({}, '', '/');
     }
-
-    return (
-      <>
-        <SEOHead
-          title="AURA Administrator CMS"
-          description="Protected Administration & Directory Management Portal."
-          canonicalPath={currentPath}
-          noIndex={true}
-        />
-        <AdminLayout
-          currentTab={adminTab}
-          onSelectTab={(tab) => {
-            if (tab === 'dashboard') navigateTo('/admin');
-            else if (tab === 'profile-new') {
-              setProfileToEdit(null);
-              navigateTo('/admin/profiles/new');
-            } else navigateTo(`/admin/${tab}`);
-          }}
-          onNavigatePublic={navigateTo}
-          pendingReportsCount={adminStats.pendingReportsCount}
-          removalRequestsCount={adminStats.removalRequestsCount}
-        >
-        {adminTab === 'dashboard' && (
-          <AdminDashboardView
-            stats={adminStats}
-            recentAuditLogs={auditLogsList}
-            recentReports={safetyReportsList}
-            onSelectTab={(tab) => {
-              if (tab === 'profile-new') {
-                setProfileToEdit(null);
-                navigateTo('/admin/profiles/new');
-              } else navigateTo(`/admin/${tab}`);
-            }}
-            onNavigatePublic={navigateTo}
-          />
-        )}
-
-        {adminTab === 'profiles' && (
-          <AdminProfilesView
-            profiles={adminProfilesList}
-            onEditProfile={(p) => {
-              setProfileToEdit(p);
-              navigateTo(`/admin/profiles/${p.id}`);
-            }}
-            onNewProfile={() => {
-              setProfileToEdit(null);
-              navigateTo('/admin/profiles/new');
-            }}
-            onUpdateStatus={handleAdminUpdateStatus}
-            onDeleteProfile={handleAdminDeleteProfile}
-            onNavigatePublic={navigateTo}
-          />
-        )}
-
-        {adminTab === 'profile-new' && (
-          <AdminProfileEditor
-            profileToEdit={profileToEdit}
-            onSave={handleAdminSaveProfile}
-            onCancel={() => navigateTo('/admin/profiles')}
-            onNavigatePublic={navigateTo}
-          />
-        )}
-
-        {adminTab === 'photos' && (
-          <AdminPhotosView
-            profiles={adminProfilesList}
-            onNavigatePublic={navigateTo}
-            onRefreshProfiles={() => {
-              setAdminProfilesList([...getAdminProfiles()]);
-              setProfiles((prev) => [...prev]);
-            }}
-          />
-        )}
-
-        {adminTab === 'locations' && <AdminLocationsView />}
-
-        {adminTab === 'reports' && (
-          <AdminReportsView onNavigatePublic={navigateTo} />
-        )}
-
-        {adminTab === 'content-removal' && <AdminContentRemovalView />}
-
-        {adminTab === 'moderation' && (
-          <AdminModerationView
-            profiles={adminProfilesList}
-            onRefresh={() => setAdminProfilesList([...getAdminProfiles()])}
-            onNavigatePublic={navigateTo}
-          />
-        )}
-
-        {adminTab === 'audit-logs' && <AdminAuditLogsView />}
-
-        {adminTab === 'rls-policies' && <AdminRLSPoliciesView />}
-
-        {adminTab === 'technical-audit' && <AdminTechnicalAuditView />}
-      </AdminLayout>
-      </>
-    );
   }
 
   // --------------------------------------------------------------------------
@@ -702,15 +475,6 @@ export default function App() {
         currentProfiles={profiles}
         onImportProfiles={(importedList) => {
           setProfiles(importedList);
-          setAdminProfilesList(
-            importedList.map((p) => ({
-              ...p,
-              status: 'published',
-              seoTitle: `${p.displayName} — Verified in ${p.city}`,
-              seoDescription: p.tagline,
-              internalNotes: 'Imported from friend workspace',
-            }))
-          );
         }}
       />
 
