@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShieldCheck, MapPin, Star, Heart, Sparkles, ChevronRight, Check, Camera, Languages } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, MapPin, Star, Heart, Sparkles, ChevronRight, Check, Camera, Languages, Link2, Copy } from 'lucide-react';
 import { Profile } from '../types';
 import { getPublicPublishedPhotos } from '../services/storageService';
 import { Badge } from './ui/Badge';
@@ -20,7 +20,31 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   onToggleFavorite,
   layoutView = 'grid',
 }) => {
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const profileUrl = `/profiles/${profile.slug}`;
+
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Allow default browser behavior for right clicks, cmd+click, ctrl+click, middle click
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    onSelect(profile);
+  };
+
+  const handleCopyDirectLink = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const fullUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}${profileUrl}`
+      : profileUrl;
+    navigator.clipboard?.writeText(fullUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
+
   const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (onToggleFavorite) {
       onToggleFavorite(e, profile.id);
@@ -39,22 +63,15 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
 
   if (layoutView === 'list') {
     return (
-      <article
-        onClick={() => onSelect(profile)}
-        tabIndex={0}
-        role="button"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onSelect(profile);
-          }
-        }}
+      <a
+        href={profileUrl}
+        onClick={handleCardClick}
         aria-label={`View profile for ${profile.displayName}`}
         className={`group relative bg-[#081528] ${
           isAriaSterling
             ? 'border-emerald-500/50 shadow-[0_0_24px_rgba(16,185,129,0.18)] hover:border-emerald-400/80 ring-1 ring-emerald-500/30'
             : 'border-slate-800/90 hover:border-red-500/50'
-        } rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01] hover:-translate-y-0.5 flex flex-col sm:flex-row cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500`}
+        } rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01] hover:-translate-y-0.5 flex flex-col sm:flex-row cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 no-underline text-inherit block`}
       >
         {/* List Image */}
         <div className="relative w-full sm:w-52 aspect-[4/3] sm:aspect-auto overflow-hidden bg-slate-950 shrink-0">
@@ -137,15 +154,27 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             )}
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-between mt-3 text-xs">
-            <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{profile.rating.toFixed(2)}</span>
-              <span className="text-slate-400 font-normal">({profile.reviewCount})</span>
+          <div className="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between mt-3 gap-2 text-xs">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-amber-400 font-bold">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>{profile.rating.toFixed(2)}</span>
+                <span className="text-slate-400 font-normal">({profile.reviewCount})</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyDirectLink}
+                className="flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700/80 text-slate-300 hover:text-white hover:border-red-500/50 transition cursor-pointer"
+                title={`Copy direct URL: ${profileUrl}`}
+              >
+                <Link2 className="w-3 h-3 text-red-400 shrink-0" />
+                <span>{copiedUrl ? 'Copied URL!' : profileUrl}</span>
+              </button>
             </div>
 
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={handleFavoriteClick}
                 className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
                 aria-label="Save to favorites"
@@ -158,27 +187,20 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             </div>
           </div>
         </div>
-      </article>
+      </a>
     );
   }
 
   return (
-    <article
-      onClick={() => onSelect(profile)}
-      tabIndex={0}
-      role="button"
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(profile);
-        }
-      }}
+    <a
+      href={profileUrl}
+      onClick={handleCardClick}
       aria-label={`View profile for ${profile.displayName}`}
       className={`group relative bg-[#081528] ${
         isAriaSterling
           ? 'border-emerald-500/50 shadow-[0_0_24px_rgba(16,185,129,0.18)] hover:border-emerald-400/80 ring-1 ring-emerald-500/30'
           : 'border-slate-800/90 hover:border-red-500/50'
-      } rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 flex flex-col cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500`}
+      } rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 flex flex-col cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 no-underline text-inherit block`}
     >
       {/* Photo Header */}
       <div className="relative aspect-[4/4] sm:aspect-[4/5] w-full overflow-hidden bg-slate-950">
@@ -230,6 +252,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
               </span>
             )}
             <button
+              type="button"
               onClick={handleFavoriteClick}
               className="p-1.5 rounded-full bg-black/60 hover:bg-black/80 text-slate-300 hover:text-white backdrop-blur-md transition cursor-pointer"
               aria-label={isFavorite ? 'Remove from saved' : 'Save profile'}
@@ -299,6 +322,23 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           )}
         </div>
 
+        {/* Direct profile URL quick link bar */}
+        <div className="flex items-center justify-between gap-1 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-400 group-hover:border-slate-700 transition">
+          <div className="flex items-center gap-1 min-w-0">
+            <Link2 className="w-3 h-3 text-red-400 shrink-0" />
+            <span className="truncate">{profileUrl}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyDirectLink}
+            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer shrink-0"
+            title={`Copy direct link: ${profileUrl}`}
+            aria-label="Copy direct profile URL"
+          >
+            {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+          </button>
+        </div>
+
         {/* Footer info & CTA */}
         <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-amber-400 font-semibold">
@@ -313,6 +353,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           </span>
         </div>
       </div>
-    </article>
+    </a>
   );
 };
