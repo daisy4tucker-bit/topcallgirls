@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, UploadCloud, Download, Check, AlertCircle, Copy, Sparkles, FileCode, RefreshCw } from 'lucide-react';
 import { Profile } from '../types';
 import { SAMPLE_PROFILES } from '../data/mockProfiles';
-import { safeStorage } from '../utils/safeStorage';
 
 interface SyncImportModalProps {
   isOpen: boolean;
@@ -129,7 +128,11 @@ export const SyncImportModal: React.FC<SyncImportModalProps> = ({
           }));
 
           // Save to localStorage & state
-          safeStorage.setItem('aura_admin_profiles', JSON.stringify(sanitized));
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('aura_admin_profiles', JSON.stringify(sanitized));
+            }
+          } catch (e) {}
           onImportProfiles(sanitized);
 
           setStatusMessage({
@@ -154,7 +157,11 @@ export const SyncImportModal: React.FC<SyncImportModalProps> = ({
   };
 
   const handleResetToDefault = () => {
-    safeStorage.setItem('aura_admin_profiles', JSON.stringify(SAMPLE_PROFILES));
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('aura_admin_profiles', JSON.stringify(SAMPLE_PROFILES));
+      }
+    } catch (e) {}
     onImportProfiles(SAMPLE_PROFILES);
     setStatusMessage({
       type: 'success',

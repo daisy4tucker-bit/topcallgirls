@@ -71,24 +71,26 @@ import { LOCATION_DATA, getLocationBySlugs, buildLocationBreadcrumbs } from './d
 import { SAMPLE_PROFILES } from './data/mockProfiles';
 import { Profile, FilterState } from './types';
 
-import { safeStorage } from './utils/safeStorage';
-
 export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(checkIsAdminAuthenticated());
   const [profiles, setProfiles] = useState<Profile[]>(() => {
-    const saved = safeStorage.getItem('aura_admin_profiles');
-    if (saved) {
+    if (typeof window !== 'undefined') {
       try {
-        const list = JSON.parse(saved);
-        if (Array.isArray(list) && list.length > 0) {
-          const published = list.filter((p: any) => p.status === 'published' || p.isPublished);
-          if (published.length > 0) return published;
+        const saved = localStorage.getItem('aura_admin_profiles');
+        if (saved) {
+          const list = JSON.parse(saved);
+          if (Array.isArray(list) && list.length > 0) {
+            const published = list.filter((p: any) => p.status === 'published' || p.isPublished);
+            if (published.length > 0) return published;
+          }
         }
       } catch (e) {
         // ignore
       }
+      try {
+        localStorage.setItem('aura_admin_profiles', JSON.stringify(INITIAL_ADMIN_PROFILES));
+      } catch (e) {}
     }
-    safeStorage.setItem('aura_admin_profiles', JSON.stringify(INITIAL_ADMIN_PROFILES));
     return SAMPLE_PROFILES;
   });
   const [adminProfilesList, setAdminProfilesList] = useState<ExtendedProfile[]>(() =>

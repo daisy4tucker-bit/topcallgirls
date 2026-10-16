@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { safeStorage } from '../utils/safeStorage';
 
 interface AgeGateModalProps {
   onVerified: () => void;
@@ -10,18 +9,21 @@ export const AgeGateModal: React.FC<AgeGateModalProps> = ({ onVerified }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const verified = safeStorage.getItem('aura_age_verified');
-    if (!verified) {
-      setIsOpen(true);
-    } else {
-      onVerified();
-    }
-    // Only check once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    try {
+      if (typeof window !== 'undefined' && localStorage.getItem('aura_age_verified')) {
+        onVerified();
+        return;
+      }
+    } catch (e) {}
+    setIsOpen(true);
+  }, [onVerified]);
 
   const handleConfirm = () => {
-    safeStorage.setItem('aura_age_verified', 'true');
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('aura_age_verified', 'true');
+      }
+    } catch (e) {}
     setIsOpen(false);
     onVerified();
   };
