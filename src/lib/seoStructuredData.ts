@@ -18,7 +18,9 @@ export interface SERPMeta {
   };
 }
 
-const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://aura-directory.com';
+const BASE_URL = typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
+  ? window.location.origin
+  : 'https://topcallgirls.onrender.com';
 
 /**
  * Generate Homepage Directory Schema & SERP Data

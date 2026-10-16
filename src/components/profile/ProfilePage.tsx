@@ -21,9 +21,7 @@ import {
   Mail,
   MessageSquare,
   AlertCircle,
-  ShieldAlert,
-  Link2,
-  Copy
+  ShieldAlert
 } from 'lucide-react';
 import { Profile } from '../../types';
 import { LocationBreadcrumbs } from '../location/LocationBreadcrumbs';
@@ -108,45 +106,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     <article aria-labelledby="profile-title" className="space-y-8 animate-in fade-in duration-300">
       {/* Breadcrumbs */}
       <LocationBreadcrumbs items={breadcrumbItems} onNavigate={onNavigateToLocation} />
-
-      {/* Direct Profile Page Permanent URL Banner */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-lg">
-        <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
-          <div className="p-2.5 rounded-xl bg-red-600/15 border border-red-500/30 text-red-400 shrink-0 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
-            <Link2 className="w-4 h-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span>Direct Profile URL</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] text-emerald-400 font-semibold lowercase">live permalink</span>
-            </div>
-            <p className="text-xs sm:text-sm font-mono text-slate-200 truncate select-all font-semibold mt-0.5">
-              {typeof window !== 'undefined' ? `${window.location.origin}/profiles/${profile.slug}` : `/profiles/${profile.slug}`}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
-          <button
-            type="button"
-            onClick={handleShare}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition shadow-md cursor-pointer"
-          >
-            {copiedLink ? (
-              <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                <span>Copied to Clipboard!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>Copy Direct Link</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
 
       {/* 1. Authorized Photography Gallery (Image Carousel First) */}
       <section aria-labelledby="gallery-title" className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">

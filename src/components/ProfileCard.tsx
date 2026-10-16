@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ShieldCheck, MapPin, Star, Heart, Sparkles, ChevronRight, Check, Camera, Languages, Link2, Copy } from 'lucide-react';
+import React from 'react';
+import { ShieldCheck, MapPin, Star, Heart, Sparkles, ChevronRight, Check, Camera, Languages } from 'lucide-react';
 import { Profile } from '../types';
 import { getPublicPublishedPhotos } from '../services/storageService';
 import { Badge } from './ui/Badge';
@@ -20,7 +20,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   onToggleFavorite,
   layoutView = 'grid',
 }) => {
-  const [copiedUrl, setCopiedUrl] = useState(false);
   const profileUrl = `/profiles/${profile.slug}`;
 
   const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -30,17 +29,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     }
     e.preventDefault();
     onSelect(profile);
-  };
-
-  const handleCopyDirectLink = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const fullUrl = typeof window !== 'undefined'
-      ? `${window.location.origin}${profileUrl}`
-      : profileUrl;
-    navigator.clipboard?.writeText(fullUrl);
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -154,22 +142,11 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             )}
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between mt-3 gap-2 text-xs">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>{profile.rating.toFixed(2)}</span>
-                <span className="text-slate-400 font-normal">({profile.reviewCount})</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopyDirectLink}
-                className="flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700/80 text-slate-300 hover:text-white hover:border-red-500/50 transition cursor-pointer"
-                title={`Copy direct URL: ${profileUrl}`}
-              >
-                <Link2 className="w-3 h-3 text-red-400 shrink-0" />
-                <span>{copiedUrl ? 'Copied URL!' : profileUrl}</span>
-              </button>
+          <div className="pt-3 border-t border-slate-800 flex items-center justify-between mt-3 text-xs">
+            <div className="flex items-center gap-1.5 text-amber-400 font-bold">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span>{profile.rating.toFixed(2)}</span>
+              <span className="text-slate-400 font-normal">({profile.reviewCount})</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -320,23 +297,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
               +{profile.services.length - 3}
             </span>
           )}
-        </div>
-
-        {/* Direct profile URL quick link bar */}
-        <div className="flex items-center justify-between gap-1 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-400 group-hover:border-slate-700 transition">
-          <div className="flex items-center gap-1 min-w-0">
-            <Link2 className="w-3 h-3 text-red-400 shrink-0" />
-            <span className="truncate">{profileUrl}</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleCopyDirectLink}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer shrink-0"
-            title={`Copy direct link: ${profileUrl}`}
-            aria-label="Copy direct profile URL"
-          >
-            {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-          </button>
         </div>
 
         {/* Footer info & CTA */}

@@ -14,7 +14,6 @@ import { InformationSection } from './components/InformationSection';
 import { CreateListingModal } from './components/CreateListingModal';
 import { DatabaseStatusModal } from './components/database/DatabaseStatusModal';
 import { SyncImportModal } from './components/SyncImportModal';
-import { AgeGateModal } from './components/AgeGateModal';
 import { SafetyBanner } from './components/SafetyBanner';
 import { ArchitectureGuide } from './components/ArchitectureGuide';
 import { DesignSystemTester } from './components/DesignSystemTester';
@@ -71,15 +70,19 @@ export default function App() {
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
   const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
-  const [isAgeVerified, setIsAgeVerified] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showTester, setShowTester] = useState(false);
   const [layoutView, setLayoutView] = useState<'grid' | 'list'>('grid');
   const [radiusMiles, setRadiusMiles] = useState(25);
   const [activeMobileTab, setActiveMobileTab] = useState<'explore' | 'search' | 'favorites' | 'post' | 'guide'>('explore');
 
-  // Client Navigation Path State
-  const [currentPath, setCurrentPath] = useState<string>('/');
+  // Client Navigation Path State initialized directly from browser location
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname) {
+      return window.location.pathname;
+    }
+    return '/';
+  });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingDB, setIsLoadingDB] = useState<boolean>(false);
   const pageSize = 6;
@@ -154,12 +157,12 @@ export default function App() {
   const isAdminRoute = currentPath.startsWith('/admin');
   const isProfileRoute = currentPath.startsWith('/profiles/');
   const currentProfileSlug = isProfileRoute
-    ? currentPath.replace('/profiles/', '').replace(/\/$/, '')
+    ? decodeURIComponent(currentPath.replace('/profiles/', '').replace(/\/$/, '')).trim().toLowerCase()
     : null;
 
   const currentProfile = useMemo(() => {
     if (!currentProfileSlug) return null;
-    return profiles.find((p) => p.slug === currentProfileSlug);
+    return profiles.find((p) => p.slug.toLowerCase() === currentProfileSlug);
   }, [profiles, currentProfileSlug]);
 
   const relatedProfiles = useMemo(() => {
@@ -324,9 +327,6 @@ export default function App() {
     <div className="min-h-screen bg-[#071322] text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white font-sans antialiased">
       {/* Dynamic SEO & Schema.org JSON-LD for Google SERP & AI engines */}
       <SEOHead {...seoData} />
-
-      {/* 18+ Legal Age Verification Gate */}
-      <AgeGateModal onVerified={() => setIsAgeVerified(true)} />
 
       {/* Header */}
       <Header

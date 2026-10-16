@@ -12,7 +12,7 @@ export interface SitemapEntry {
   category: 'Home' | 'Country' | 'State' | 'City' | 'Profile' | 'Informational';
 }
 
-const DEFAULT_BASE_URL = 'https://aura-directory.com';
+const DEFAULT_BASE_URL = 'https://topcallgirls.onrender.com';
 
 /**
  * Returns list of all approved indexable public URLs for the directory
