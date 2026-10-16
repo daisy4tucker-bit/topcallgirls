@@ -108,3 +108,6 @@ export interface AuditLogEntry {
   details: string;
   timestamp: string;
 }
+
+export type RemovalRequest = ContentRemovalRequest;
+export type AuditLog = AuditLogEntry;

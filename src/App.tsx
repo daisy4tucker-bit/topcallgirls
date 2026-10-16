@@ -245,7 +245,7 @@ export default function App() {
     }
 
     return {
-      title: 'Aura Directory – Verified Companions & Local Escort Directory',
+      title: 'Top Call Girls',
       description: 'Discover verified independent companions, VIP outcalls, and social escorts across major US & Canadian metropolitan hubs. 18+ ID verified.',
       type: 'website' as const,
       canonicalPath: '/',

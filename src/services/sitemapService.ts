@@ -29,7 +29,7 @@ export function getIndexableSitemapEntries(baseUrl: string = DEFAULT_BASE_URL): 
     lastmod: now,
     changefreq: 'daily',
     priority: '1.0',
-    title: 'Aura Directory Home — Verified Adult Companions & Escorts',
+    title: 'Top Call Girls — Verified Adult Companions & Escorts',
     category: 'Home',
   });
 

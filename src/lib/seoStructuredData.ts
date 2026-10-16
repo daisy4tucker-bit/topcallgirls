@@ -25,20 +25,20 @@ const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https
  */
 export function getHomepageSEO(): SERPMeta {
   const canonicalUrl = `${BASE_URL}/`;
-  const title = 'Aura Directory – Verified Local Escorts, Companions & TS Models Near You';
+  const title = 'Top Call Girls';
   const description =
     'Browse 100% ID-verified independent escorts, TS/transgender models, and female companions across top US and Canadian cities. Safe, discreet, and updated daily.';
 
   const faqItems = [
     {
-      question: 'How are profiles verified on Aura Directory?',
+      question: 'How are profiles verified on Top Call Girls?',
       answer:
         'All companion listings undergo mandatory government photo ID checks and biometric facial verification under 18 U.S.C. 2257 guidelines to eliminate impersonation and underage accounts.',
     },
     {
       question: 'Can I find both female and transgender / TS companions near me?',
       answer:
-        'Yes. Aura Directory offers dedicated filtering for verified female companions, transgender (TS) models, VIP luxury escorts, and independent private studios with direct contact info.',
+        'Yes. Top Call Girls offers dedicated filtering for verified female companions, transgender (TS) models, VIP luxury escorts, and independent private studios with direct contact info.',
     },
     {
       question: 'How do I contact an independent companion or model?',
@@ -54,7 +54,7 @@ export function getHomepageSEO(): SERPMeta {
         '@type': 'WebSite',
         '@id': `${canonicalUrl}#website`,
         url: canonicalUrl,
-        name: 'Aura Directory',
+        name: 'Top Call Girls',
         description,
         potentialAction: {
           '@type': 'SearchAction',

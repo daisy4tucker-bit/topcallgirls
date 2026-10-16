@@ -52,15 +52,16 @@ export const Header: React.FC<HeaderProps> = ({
             href="/"
             onClick={handleLogoClick}
             className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-lg"
-            aria-label="Call Girls Home"
+            aria-label="Top Call Girls Home"
           >
             <div className="relative flex items-center justify-center p-2 rounded-xl bg-red-600/15 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.4)] group-hover:scale-105 transition-transform">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 fill-red-500 shrink-0 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-[#081528] animate-ping" />
             </div>
             <div className="flex items-center text-xl sm:text-2xl font-black tracking-tight">
-              <span className="text-white">Call</span>
-              <span className="text-red-500 ml-0.5">Girls</span>
+              <span className="text-red-500">Top</span>
+              <span className="text-white ml-1.5">Call</span>
+              <span className="text-red-500 ml-1.5">Girls</span>
             </div>
           </a>
 

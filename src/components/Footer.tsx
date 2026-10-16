@@ -31,8 +31,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToLocation }) => {
                 <MapPin className="w-4 h-4 text-red-500 fill-red-500 shrink-0 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               </div>
               <div className="flex items-center text-lg font-black tracking-tight">
-                <span className="text-white">Call</span>
-                <span className="text-red-500 ml-0.5">Girls</span>
+                <span className="text-red-500">Top</span>
+                <span className="text-white ml-1">Call</span>
+                <span className="text-red-500 ml-1">Girls</span>
               </div>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed max-w-xs">

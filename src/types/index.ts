@@ -47,8 +47,10 @@ export interface Profile {
   languages: string[];
   availability: ProfileAvailability;
   contactInfo: ProfileContactInfo;
-  statusBadge: 'Active & Verified' | 'Featured VIP' | 'New Listing' | 'Away';
+  statusBadge: 'Active & Verified' | 'Featured VIP' | 'New Listing' | 'Away' | string;
   lastUpdated: string;
+  status?: string;
+  isPublished?: boolean;
   reviews?: ProfileReview[];
 }
 

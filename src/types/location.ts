@@ -44,3 +44,11 @@ export interface BreadcrumbItem {
   path: string;
   isActive?: boolean;
 }
+
+export type LocationBreadcrumb = BreadcrumbItem;
+
+export interface LocationContext {
+  country?: Country | null;
+  state?: StateProvince | null;
+  city?: City | null;
+}
